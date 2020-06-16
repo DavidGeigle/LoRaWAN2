@@ -12,8 +12,8 @@
 /*                                       TYPEDEFS                                           */
 /********************************************************************************************/
 typedef struct gps_data_frame_t {
-    float gps_longitude;
     float gps_latitude;
+    float gps_longitude;
     float gps_altitude;
     int satellites;
     int year;
@@ -26,11 +26,6 @@ typedef struct gps_data_frame_t {
     unsigned long fix_age;
     unsigned long date_age;
 };
-
-/*typedef union gps_data {
-    gps_data_frame_t data_structure;
-    uint8_t byte_stream_t[sizeof(gps_data_frame_t)];
-};*/
 
 /********************************************************************************************/
 /*                                     CLASS DECLARATION                                    */

@@ -34,7 +34,7 @@
 #include <lmic.h>
 #include <hal/hal.h>
 #include "GPS.h"
-#include "LoRa_Codec.h"
+#include "LoRa_DataManager.h"
 #include <SPI.h>
 
 /********************************************************************************************/
@@ -84,12 +84,14 @@ void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8);}
 static const u1_t PROGMEM APPKEY[16] = {0xac, 0x28, 0x7e, 0xdf, 0x33, 0xca, 0x66, 0x6b, 0xfc, 0x64, 0xdb, 0x13, 0x89, 0x8f, 0x9c, 0x6a};
 void os_getDevKey (u1_t* buf) {  memcpy_P(buf, APPKEY, 16);}
 
-data_frame_t node_data;
+//data_frame_t is deprecated;
+//data_frame_t node_data;
 static osjob_t sendjob;
+LoRa_DataManager codec_obj;
 
 // Schedule TX every this many seconds (might become longer due to duty
 // cycle limitations).
-const unsigned TX_INTERVAL = 30;
+const unsigned TX_INTERVAL = 10;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -175,12 +177,11 @@ void onEvent (ev_t ev) {
 
 void do_send(osjob_t* j){
     digitalWrite(TX_LED, HIGH);
-    ++node_data.frame_counter;
     byte_buffer_t tx_buffer;
-    LoRa_Codec codec_obj;
-    codec_obj.encoder(node_data, tx_buffer);
+    codec_obj.encoder(tx_buffer);
+   
+
     // Check if there is not a current TX/RX job running
-    Serial.println(sizeof(lora_payload_t));
     if (LMIC.opmode & OP_TXRXPEND) {
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
@@ -196,7 +197,7 @@ void init_board( void ) {
     pinMode(TX_LED, OUTPUT);
 }
 
-static float read_battery_status( void ) {
+static float read_battery_voltage( void ) {
     float measuredvbat = analogRead(VBATPIN);
     measuredvbat *= 2;    // we divided by 2, so multiply back
     measuredvbat *= 3.3;  // Multiply by 3.3V, our reference voltage
@@ -204,31 +205,25 @@ static float read_battery_status( void ) {
     return measuredvbat;
 }
 
-static bool is_battery_connected( void ) {
-    float battery_status = read_battery_status();
-    return battery_status <= bat_max_v ? true : false;
-}
+static uint8_t get_battery_level_percent() {
+    uint8_t measuredvbat_percent = 0;
 
-static bool power_over_battery() {
-    
-}
+    float measuredvbat = read_battery_voltage();
+    double upper_barrier_bat_max_v = bat_max_v*100;
+    Serial.print("VBat: " ); 
+    Serial.println(measuredvbat);
 
-static uint8_t get_battery_status_percent() {
-    uint8_t measuredvbat_percent = 255;
-    if(is_battery_connected) {
-        float measuredvbat = read_battery_status();
-        Serial.print("VBat: " ); 
-        Serial.println(measuredvbat);
-    }
-    else {
-        Serial.print("Battery not connected" );
-    }
+        
+    measuredvbat_percent = map((long)(measuredvbat*100), 0, 
+                                  upper_barrier_bat_max_v, 0, 100);
+    measuredvbat_percent = measuredvbat_percent >= 100 ? 100 : measuredvbat_percent;
+    Serial.println(measuredvbat_percent);
+    return measuredvbat_percent;
 }
 
 void setup() {
     init_board();
     Serial.println(F("Starting"));
-    node_data.frame_counter=0;
     // LMIC init
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.
@@ -240,18 +235,20 @@ void setup() {
 
 void loop() {
     GPS gps_obj(&Serial1);
-    
+    gps_data_frame_t gps_data;
     unsigned long old_time = 0;
     while(true) {
-        gps_obj.get_data(node_data.pos_time_data);
+        gps_obj.get_data(gps_data);
         
         if(old_time+1000 < millis()) {
-            gps_obj.print_date(node_data.pos_time_data);
+            gps_obj.print_date(gps_data);
             Serial.println();
-            gps_obj.print_position(node_data.pos_time_data);
+            gps_obj.print_position(gps_data);
             Serial.println();
             old_time = millis();
-            get_battery_status_percent();
+            codec_obj.set_gps_data(gps_data);
+            codec_obj.set_battery_level(get_battery_level_percent());
+            
         }
         os_runloop_once();
     }
