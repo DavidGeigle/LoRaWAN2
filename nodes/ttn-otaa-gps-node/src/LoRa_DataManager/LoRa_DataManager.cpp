@@ -7,6 +7,10 @@
  * must be included in any redistribution.
  *
  ****************************************************************************/
+
+ /****************************************************************************
+ * INCLUDES                                         
+ ****************************************************************************/
 #include "LoRa_DataManager.h"
 
 /****************************************************************************
@@ -23,6 +27,14 @@ enum data_flag{
 /****************************************************************************
  * METHOD IMPLEMENTATION                                        
  ****************************************************************************/
+
+/**
+ * This method corrects the endianness for lora transfer of uint32_t values.
+ * 
+ * @param [in] value uint32_t to convert 
+ *        
+ * @return the converted uint32_t
+ */
 uint32_t LoRa_DataManager::correct_endianness_uint32(uint32_t value) {
     uint32_t buffer = 0x00000000;
     buffer |=  0x000000FF & (value >> 24);
@@ -32,6 +44,13 @@ uint32_t LoRa_DataManager::correct_endianness_uint32(uint32_t value) {
     return buffer;
 }
 
+/**
+ * This method corrects the endianness for lora transfer of uint16_t values.
+ * 
+ * @param [in] value uint16_t to convert 
+ *        
+ * @return the converted uint16_t
+ */
 uint16_t LoRa_DataManager::correct_endianness_uint16(uint16_t value) {
     uint32_t buffer = 0x0000;
     buffer |=  0x00FF & (value >> 8);
@@ -49,7 +68,7 @@ uint16_t LoRa_DataManager::correct_endianness_uint16(uint16_t value) {
  * @param [in] precission Tells the method, how many decimal 
  *        places be noted
  *        
- * @return the converted int
+ * @return the converted value as uint32_t
  */
 uint32_t LoRa_DataManager::convert_float_to_uint32(float value, int precission) {
     uint32_t buffer = 0;
@@ -58,6 +77,11 @@ uint32_t LoRa_DataManager::convert_float_to_uint32(float value, int precission) 
     return buffer;
 }
 
+/**
+ * This the default constructor.
+ * 
+ * @param [in] enable_frame_counter default is ative.
+ */
 LoRa_DataManager::LoRa_DataManager(bool enable_frame_counter) {
     //status flags for package encodeing
     gps_active = false;
@@ -70,6 +94,12 @@ LoRa_DataManager::LoRa_DataManager(bool enable_frame_counter) {
     lora_payload.battery_status_flag = battery_status_flag;
 }
 
+/**
+ * Set GPS data for bytestream convertion.
+ * !!! Activates gps data package !!!
+ * 
+ * @param [in] data referenz of gps data structure 
+ */
 void LoRa_DataManager::set_gps_data(const gps_data_frame_t &data) {
     gps_active = true;
     lora_payload.gps_latitude = convert_float_to_uint32(data.gps_latitude, 6);
@@ -83,9 +113,18 @@ void LoRa_DataManager::set_gps_data(const gps_data_frame_t &data) {
     lora_payload.gps_second = data.second;
 }
 
+/**
+ * Set set battery level for bytestream convertion.
+ * !!! Activates battery status package !!!
+ * 
+ * note: If value is not in the intvall [0, 100] the 
+ * battery_value field holds the error value 200.
+ * 
+ * @param [in] battery_level_percent holds battery level in percent 
+ */
 void LoRa_DataManager::set_battery_level(uint8_t battery_level_percent) {
     battery_status_active = true;
-    if(battery_level_percent >= 0 || battery_level_percent <= 100) {
+    if(battery_level_percent <= 100) {
         lora_payload.battery_level = battery_level_percent;
     }
     else {
@@ -94,6 +133,11 @@ void LoRa_DataManager::set_battery_level(uint8_t battery_level_percent) {
     }
 }
 
+/**
+ * Helper function to encode the frame counter package.
+ * 
+ * @param [out] p_buffer pointer referenz to current buffer address.
+ */
 void LoRa_DataManager::encode_frame_counter(uint8_t* &p_buffer) {
     if(frame_counter_active) {
         //increas frame counter if a new frame is requested!
@@ -107,6 +151,11 @@ void LoRa_DataManager::encode_frame_counter(uint8_t* &p_buffer) {
     }
 }
 
+/**
+ * Helper function to encode the gps package.
+ * 
+ * @param [out] p_buffer pointer referenz to current buffer address.
+ */
 void LoRa_DataManager::encode_gps(uint8_t* &p_buffer) {
     if(gps_active) {
         //encode gps package
@@ -136,6 +185,11 @@ void LoRa_DataManager::encode_gps(uint8_t* &p_buffer) {
     }
 }
 
+/**
+ * Helper function to encode the battery status package.
+ * 
+ * @param [out] p_buffer pointer referenz to current buffer address.
+ */
 void LoRa_DataManager::encode_battery_status(uint8_t* &p_buffer) {
     if(battery_status_active) {
         //encode battery status package
@@ -146,17 +200,25 @@ void LoRa_DataManager::encode_battery_status(uint8_t* &p_buffer) {
     }
 }
 
+/**
+ * Encodes the member value lora_payload into compact bytestream.
+ * The bytestream is used as lora payload.
+ * 
+ * @param [out] referenz to byte stream buffer.
+ */
 void LoRa_DataManager::encoder(byte_buffer_t &tx_buffer) {
     uint8_t buffer [sizeof(tx_buffer)] = {0};
     //actual memory index
     uint8_t *p_buffer = buffer;
 
+    //encode data
     this->encode_frame_counter(p_buffer);
     this->encode_gps(p_buffer);
     this->encode_battery_status(p_buffer);
 
     //copy buffer to tx_stream
     memcpy( tx_buffer.byte_stream, buffer, sizeof(tx_buffer.byte_stream));
+    tx_buffer.byte_stream_size = (size_t)(p_buffer + 1 - buffer);
 }
 
 /*void LoRa_Codec::decoder(const lora_payload_t rx_buffer, data_frame_t &data) {

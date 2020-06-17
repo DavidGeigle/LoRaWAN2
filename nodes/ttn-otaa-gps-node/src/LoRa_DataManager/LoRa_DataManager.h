@@ -15,15 +15,17 @@
 /****************************************************************************
  * INCLUDES                                         
  ****************************************************************************/
-#include "GPS.h"
+#include "../GPS/GPS.h"
 
 /****************************************************************************
  * DEFINITION                                         
  ****************************************************************************/
 typedef uint8_t flag_t;
 
-//struct hold payload with flags
-typedef struct lora_data_frame_t {
+//class data structure. Holds all data wich will be converted to lora payload bytestream.
+//This structure defines the size of the TX buffer!!!
+//Make shure all needed package types are entered.
+typedef struct {
     flag_t   frame_counter_flag;
     uint32_t frame_counter;
     flag_t   gps_flag;
@@ -38,11 +40,12 @@ typedef struct lora_data_frame_t {
     uint8_t  gps_second; 
     flag_t   battery_status_flag;
     uint8_t  battery_level;
-};
+} lora_data_frame_t ;
 
-typedef struct byte_buffer_t {
+typedef struct {
   uint8_t byte_stream[sizeof(lora_data_frame_t)];
-};
+  size_t byte_stream_size;  //size of relevant payload. All packages activated?
+} byte_buffer_t;
 
 /****************************************************************************
  * CLASS DEFINITION

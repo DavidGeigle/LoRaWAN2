@@ -1,3 +1,12 @@
+/****************************************************************************
+ * @file GPS.h
+ *
+ * @author Timon Tscheulin
+ * 
+ * BSD license, all text above, and the splash screen header file,
+ * must be included in any redistribution.
+ *
+ ****************************************************************************/
 #ifndef __GPS_H__
 #define __GPS_H__
 
@@ -11,7 +20,8 @@
 /********************************************************************************************/
 /*                                       TYPEDEFS                                           */
 /********************************************************************************************/
-typedef struct gps_data_frame_t {
+
+typedef struct {
     float gps_latitude;
     float gps_longitude;
     float gps_altitude;
@@ -25,7 +35,7 @@ typedef struct gps_data_frame_t {
     byte hundredths;
     unsigned long fix_age;
     unsigned long date_age;
-};
+} gps_data_frame_t;
 
 /********************************************************************************************/
 /*                                     CLASS DECLARATION                                    */

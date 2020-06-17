@@ -31,11 +31,11 @@
 /********************************************************************************************/
 /*                                       INCLUDES                                           */
 /********************************************************************************************/
+#include <SPI.h>
 #include <lmic.h>
 #include <hal/hal.h>
-#include "GPS.h"
-#include "LoRa_DataManager.h"
-#include <SPI.h>
+#include "src/GPS/GPS.h"
+#include "src/LoRa_DataManager/LoRa_DataManager.h"
 
 /********************************************************************************************/
 /*                                       DEFINES                                            */
@@ -55,11 +55,6 @@
 /********************************************************************************************/
 
 const float bat_max_v = 4.2;
-
-/********************************************************************************************/
-/*                                       TYPEDEFS                                           */
-/********************************************************************************************/
-
 
 /********************************************************************************************/
 /*                                 VARIABLE DECLARATION                                     */
@@ -186,7 +181,8 @@ void do_send(osjob_t* j){
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
         // Prepare upstream data transmission at the next possible time.
-        LMIC_setTxData2(1, tx_buffer.byte_stream, sizeof(tx_buffer.byte_stream), 0);
+        //LMIC_setTxData2(1, tx_buffer.byte_stream, sizeof(tx_buffer.byte_stream), 0);
+        LMIC_setTxData2(1, tx_buffer.byte_stream, tx_buffer.byte_stream_size, 0);
         Serial.println(F("Packet queued"));
     }
     // Next TX is scheduled after TX_COMPLETE event.
