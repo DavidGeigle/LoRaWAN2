@@ -81,6 +81,23 @@ function rakSensorDataDecode(hexStr) {
         myObj.device_status_battery_level = parseInt(str.substring(2, 4), 16);
         str = str.substring(4);
         break;
+      case 0x05:// mq135
+        myObj.mq135_co2_ppm = parseInt(str.substring(2, 6), 16);
+        str = str.substring(6);
+        break;
+      case 0x06://scd30
+        var scd30 = {};
+        //convert this values to float?
+        scd30.scd30_co2_ppm = parseInt(str.substring(2, 6), 16);
+        scd30.scd30_temperature = parseInt(str.substring(6, 10), 16);
+        scd30.scd30_humidity = parseInt(str.substring(10, 14), 16);
+        myObj.scd30 = scd30;
+        str = str.substring(14);
+        break;
+      case 0x07://tsl2591
+        myObj.tsl2591_lux = parseInt(str.substring(2,10),16);
+        str = str.substring(10);
+        break;
       default:
         str = str.substring(2);
         break;
