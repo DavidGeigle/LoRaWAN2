@@ -22,6 +22,9 @@ enum data_flag{
     frame_counter_flag,
     gps_flag,
     battery_status_flag,
+    mq_135_flag,
+    scd_30_flag,
+    tsl2591_flag,
 };
 
 /****************************************************************************
@@ -87,11 +90,17 @@ LoRa_DataManager::LoRa_DataManager(bool enable_frame_counter) {
     gps_active = false;
     frame_counter_active = enable_frame_counter;
     battery_status_active = false;
+    mq135_active = false;
+    scd30_active = false;
+    tsl2591_active = false;
     /*Set all frame-flags in this constructor. They are allways the same!*/
     lora_payload.frame_counter = 0;
     lora_payload.frame_counter_flag = (int)frame_counter_flag;
     lora_payload.gps_flag = gps_flag;
     lora_payload.battery_status_flag = battery_status_flag;
+    lora_payload.mq135_flag = mq_135_flag;
+    lora_payload.scd30_flag = scd_30_flag;
+    lora_payload.tsl2591_flag = tsl2591_flag;
 }
 
 /**
@@ -131,6 +140,23 @@ void LoRa_DataManager::set_battery_level(uint8_t battery_level_percent) {
         //error value
         lora_payload.battery_level = 200;
     }
+}
+
+void LoRa_DataManager::set_mq135_data(uint16_t co2_data) {
+    mq135_active = true;
+    lora_payload.mq135_co2_ppm = correct_endianness_uint16(co2_data);
+}
+
+void LoRa_DataManager::set_scd30_data(float[] sensor_data) {
+    scd30_active = true;
+    lora_payload.scd30_co2_ppm = correct_endianness_uint16((uint16_t) sensor_data[0]);
+    lora_payload.scd30_temperature = correct_endianness_uint16((uint16_t) sensor_data[1]);
+    lora_payload.scd30_humidity = correct_endianness_uint16((uint16_t) sensor_data[2]);
+}
+
+void LoRa_DataManager::set_tsl2591_data(uint32_t lux_data) {
+    tsl2591_active = true;
+    lora_payload.tsl2591_lux = correct_endianness_uint32(lux_data);
 }
 
 /**
@@ -185,6 +211,43 @@ void LoRa_DataManager::encode_gps(uint8_t* &p_buffer) {
     }
 }
 
+void LoRa_DataManager::encode_mq135(uint8_t* &p_buffer) {
+    if(mq135_active) {
+        //encode mq135 package
+        memmove(p_buffer, &lora_payload.mq135_flag, sizeof(lora_payload.mq135_flag));
+        p_buffer += sizeof(lora_payload.mq135_flag);
+        memmove(p_buffer, &lora_payload.mq135_co2_ppm, sizeof(lora_payload.mq135_co2_ppm));
+        p_buffer += sizeof(lora_payload.mq135_co2_ppm);
+    }
+}
+
+scd30_co2_ppm;
+    uint16_t ;
+    uint16_t ;
+void LoRa_DataManager::encode_scd30(uint8_t* &p_buffer) {
+    if(scd30_active) {
+        //encode sdc30 package
+        memmove(p_buffer, &lora_payload.scd30_flag, sizeof(lora_payload.scd30_flag));
+        p_buffer += sizeof(lora_payload.scd30_flag);
+        memmove(p_buffer, &lora_payload.scd30_co2_ppm, sizeof(lora_payload.scd30_co2_ppm));
+        p_buffer += sizeof(lora_payload.scd30_co2_ppm);
+        memmove(p_buffer, &lora_payload.scd30_temperature, sizeof(lora_payload.scd30_temperature));
+        p_buffer += sizeof(lora_payload.scd30_temperature);
+        memmove(p_buffer, &lora_payload.scd30_humidity, sizeof(lora_payload.scd30_humidity));
+        p_buffer += sizeof(lora_payload.scd30_humidity);
+    }
+}
+
+void LoRa_DataManager::encode_tsl2591(uint8_t* &p_buffer) {
+    if(tsl2591_active) {
+        //encode tsl2591 package
+        memmove(p_buffer, &lora_payload.tsl2591_flag, sizeof(lora_payload.tsl2591_flag));
+        p_buffer += sizeof(lora_payload.tsl2591_flag);
+        memmove(p_buffer, &lora_payload.tsl2591_lux, sizeof(lora_payload.tsl2591_lux));
+        p_buffer += sizeof(lora_payload.tsl2591_lux);
+    }
+}
+
 /**
  * Helper function to encode the battery status package.
  * 
@@ -215,6 +278,9 @@ void LoRa_DataManager::encoder(byte_buffer_t &tx_buffer) {
     this->encode_frame_counter(p_buffer);
     this->encode_gps(p_buffer);
     this->encode_battery_status(p_buffer);
+    this->encode_mq135(p_buffer);
+    this->encode_scd30(p_buffer);
+    this->encode_tsl2591(p_buffer);
 
     //copy buffer to tx_stream
     memcpy( tx_buffer.byte_stream, buffer, sizeof(tx_buffer.byte_stream));

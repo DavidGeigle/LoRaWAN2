@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="916e9bf7-a259-47ea-91f6-daa06dfc9914" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../nodes/lora-node/lora-node.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../nodes/lora-node/lora-node.ino" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +37,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RunManager">
     <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -90,6 +91,7 @@
       <option name="presentableId" value="Default" />
       <updated>1590668549196</updated>
       <workItem from="1590668575740" duration="1597000" />
+      <workItem from="1592752862987" duration="967000" />
     </task>
     <servers />
   </component>
@@ -117,14 +119,14 @@
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="1674" height="398" key="GridCell.Tab.0.right/0.0.3440.1400/-2560.162.2560.1040@0.0.3440.1400" timestamp="1590757226701" />
-    <state x="2081" y="342" key="SettingsEditor" timestamp="1590668933194">
+    <state x="2083" y="343" key="SettingsEditor" timestamp="1592759975785">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
-    <state x="2081" y="342" key="SettingsEditor/0.0.3440.1400/-2560.162.2560.1040@0.0.3440.1400" timestamp="1590668933194" />
-    <state x="2276" y="523" key="com.intellij.ide.util.TipDialog" timestamp="1590668577628">
+    <state x="2083" y="343" key="SettingsEditor/0.0.3440.1400/-2560.162.2560.1040@0.0.3440.1400" timestamp="1592759975785" />
+    <state x="2276" y="523" key="com.intellij.ide.util.TipDialog" timestamp="1592752865873">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
-    <state x="2276" y="523" key="com.intellij.ide.util.TipDialog/0.0.3440.1400/-2560.162.2560.1040@0.0.3440.1400" timestamp="1590668577628" />
+    <state x="2276" y="523" key="com.intellij.ide.util.TipDialog/0.0.3440.1400/-2560.162.2560.1040@0.0.3440.1400" timestamp="1592752865873" />
     <state x="2265" y="389" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1590669126065">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>

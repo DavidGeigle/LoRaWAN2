@@ -40,6 +40,14 @@ typedef struct {
     uint8_t  gps_second; 
     flag_t   battery_status_flag;
     uint8_t  battery_level;
+    flag_t   mq135_flag;
+    uint16_t mq135_co2_ppm;
+    flag_t   scd30_flag;
+    uint16_t scd30_co2_ppm;
+    uint16_t scd30_temperature;
+    uint16_t scd30_humidity;
+    flag_t   tsl2591_flag;
+    uint32_t tsl2591_lux;
 } lora_data_frame_t ;
 
 typedef struct {
@@ -55,10 +63,16 @@ class LoRa_DataManager {
     bool gps_active;
     bool frame_counter_active;
     bool battery_status_active;
+    bool mq135_active;
+    bool scd30_active;
+    bool tsl2591_active;
 public:
     LoRa_DataManager(bool enable_frame_counter=true);
     void set_gps_data(const gps_data_frame_t &data);
     void set_battery_level(uint8_t  battery_level_percent);
+    void set_mq135_data(uint16_t co2_data);
+    void set_scd30_data(float[] sensor_data);
+    void set_tsl2591_data(uint32_t lux_data);
     void encoder(byte_buffer_t &tx_buffer);
     //void decoder(const lora_payload_t rx_buffer, data_frame_t &data);
 private:
@@ -67,6 +81,9 @@ private:
     static uint32_t convert_float_to_uint32(float value, int precission=0);
     void encode_frame_counter(uint8_t* &p_buffer);
     void encode_gps(uint8_t* &p_buffer);
+    void encode_mq135(uint8_t* &p_buffer);
+    void encode_scd30(uint8_t* &p_buffer);
+    void encode_tsl2591(uint8_t* &p_buffer);
     void encode_battery_status(uint8_t* &p_buffer);
 };
 #endif
