@@ -221,9 +221,6 @@ void LoRa_DataManager::encode_mq135(uint8_t* &p_buffer) {
     }
 }
 
-scd30_co2_ppm;
-    uint16_t ;
-    uint16_t ;
 void LoRa_DataManager::encode_scd30(uint8_t* &p_buffer) {
     if(scd30_active) {
         //encode sdc30 package
