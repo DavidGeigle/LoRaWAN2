@@ -12,7 +12,7 @@ This example is adapted from the deck.gl documentation.
 import pydeck as pdk
 
 HEATMAP_LAYER_DATA = (
-    "data2.csv"  # noqa
+    "data.csv"  # noqa
 )
 
 # Define a layer to display on a map
@@ -21,8 +21,7 @@ layer = pdk.Layer(
     HEATMAP_LAYER_DATA,
     get_position=["longitude", "latitude"],
     auto_highlight=True,
-    aggregation='"MEAN"',
-    #get_weight="weight",
+    #get_weight="rssi",
     pickable=True,
 )
 
